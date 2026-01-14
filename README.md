@@ -2,6 +2,8 @@
 
 **AI GTM Agent** is an autonomous Go-To-Market system designed to automate and optimize the outbound sales lifecycle. It leverages agentic workflows to handle lead ingestion, deep research, personalized email drafting, and intelligent reply classification—all while keeping a human in the loop for final approval.
 
+👉 **[View Integration Roadmap](docs/INTEGRATIONS.md)**
+
 ## 🏗 Architecture
 
 The system follows a modular, event-driven architecture organized into specialized agents and services.
