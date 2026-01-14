@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI GTM Agent - Admin Console</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>AI GTM Agent Ops</h1>
+        <nav>
+            <button class="active">Dashboard</button>
+            <button id="btn-simulate">Inject Test Lead</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="metrics">
+            <div class="card">
+                <h3>Total Leads</h3>
+                <p class="number">1,245</p>
+            </div>
+            <div class="card">
+                <h3>Emails Sent</h3>
+                <p class="number">850</p>
+            </div>
+            <div class="card">
+                <h3>Reply Rate</h3>
+                <p class="number">4.2%</p>
+            </div>
+            <div class="card">
+                <h3>Interested</h3>
+                <p class="number">12</p>
+            </div>
+        </section>
+
+        <section id="review-queue">
+            <h2>Review Queue (Pending Approval)</h2>
+            <div class="lead-item">
+                <div class="lead-info">
+                    <h4>Alice Digits</h4>
+                    <span class="company">Tech Corp</span>
+                </div>
+                <div class="email-preview">
+                    <strong>Subject:</strong> Question about Tech Corp strategy<br>
+                    <p>Hi Alice, I noticed Tech Corp...</p>
+                </div>
+                <div class="actions">
+                    <button class="btn-approve">Approve</button>
+                    <button class="btn-edit">Edit</button>
+                    <button class="btn-reject">Reject</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

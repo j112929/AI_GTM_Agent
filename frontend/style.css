@@ -1,0 +1,170 @@
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent: #38bdf8;
+    --accent-hover: #0ea5e9;
+    --border: #334155;
+    --success: #22c55e;
+    --danger: #ef4444;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+header {
+    background-color: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+nav button {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    margin-left: 1.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+nav button:hover, nav button.active {
+    color: var(--accent);
+}
+
+main {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Metrics Grid */
+#metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.card h3 {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card .number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Review Queue */
+#review-queue h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.lead-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 200px 1fr 150px;
+    gap: 2rem;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.lead-info h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+}
+
+.lead-info .company {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.email-preview {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.email-preview strong {
+    color: var(--text-primary);
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+button[class^="btn-"] {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.btn-approve {
+    background-color: var(--success);
+    color: white;
+}
+
+.btn-edit {
+    background-color: var(--border);
+    color: var(--text-primary);
+}
+
+.btn-reject {
+    background-color: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+button:hover {
+    filter: brightness(1.1);
+}
