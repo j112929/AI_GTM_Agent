@@ -38,6 +38,7 @@ class LeadIngestionService:
         # 4. Store
         try:
             self.db.add_lead(lead)
+            self.db.log_event(lead_id, "INGEST", f"Source: {source}")
             logger.info(f"Ingested lead: {name} from {company} (ID: {lead_id})")
             return lead_id
         except Exception as e:

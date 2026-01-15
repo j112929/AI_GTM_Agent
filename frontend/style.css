@@ -48,7 +48,8 @@ nav button {
     transition: color 0.2s;
 }
 
-nav button:hover, nav button.active {
+nav button:hover,
+nav button.active {
     color: var(--accent);
 }
 
@@ -94,22 +95,80 @@ main {
     margin: 0;
 }
 
-/* Review Queue */
-#review-queue h2 {
-    font-size: 1.5rem;
+/* Review Queue Headers */
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5rem;
 }
 
+.queue-header h2 {
+    margin: 0;
+}
+
+.batch-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--accent);
+}
+
+#selected-count {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Lead Item Grid Update */
 .lead-item {
+    display: grid;
+    grid-template-columns: 40px 200px 1fr 150px;
+    /* Added checkbox column */
+    gap: 1.5rem;
+    /* ... rest as before ... */
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: 0.75rem;
     padding: 1.5rem;
-    display: grid;
-    grid-template-columns: 200px 1fr 150px;
-    gap: 2rem;
     align-items: start;
     margin-bottom: 1rem;
+}
+
+.selection-col {
+    display: flex;
+    justify-content: center;
+    padding-top: 0.25rem;
+}
+
+.lead-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+}
+
+.view-logs {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.body-edit {
+    width: 100%;
+    min-height: 80px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
 }
 
 .lead-info h4 {

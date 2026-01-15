@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import os
 from backend.storage.db import LeadStore
 from backend.services.lead_ingest.ingest import LeadIngestionService
@@ -58,9 +58,20 @@ def process_lead_pipeline(lead_id: str):
     gen = EmailGeneratorAgent()
     lead = gen.generate_email(lead)
     
-    # Persist changes
+    # Update full lead in DB
     db.update_lead(lead)
     logger.info(f"Pipeline complete for {lead_id}")
+
+@app.get("/metrics")
+def get_metrics():
+    todays = db.get_todays_metrics()
+    return {
+        "date": todays.date,
+        "sent": todays.sent_count,
+        "replied": todays.reply_count,
+        "positive": todays.positive_count,
+        "bounced": todays.bounce_count
+    }
 
 @app.get("/leads", response_model=List[LeadResponse])
 def get_leads():
@@ -118,6 +129,33 @@ async def serve_css():
 @app.get("/app.js")
 async def serve_js():
     return FileResponse(os.path.join(FRONTEND_DIR, "app.js"))
+
+@app.post("/leads/batch-approve")
+def batch_approve(payload: Dict[str, Any]):
+    lead_ids = payload.get("lead_ids", [])
+    overrides = payload.get("overrides", {}) # Map of lead_id -> {subject, body}
+    
+    sender = SendOrchestrator(db)
+    results = {"success": [], "failed": []}
+    
+    for lid in lead_ids:
+        try:
+            db.log_event(lid, "APPROVE_ATTEMPT", "Batch approval triggered")
+            # Extract override if any
+            ovr = overrides.get(lid, {})
+            sender.approve_and_send(lid, subject_override=ovr.get("subject"), body_override=ovr.get("body"))
+            results["success"].append(lid)
+        except Exception as e:
+            logger.error(f"Failed to approve {lid}: {e}")
+            db.log_event(lid, "APPROVE_ERROR", str(e))
+            results["failed"].append(lid)
+            
+    return results
+
+@app.get("/leads/{lead_id}/logs")
+def get_lead_logs(lead_id: str):
+    logs = db.get_lead_logs(lead_id)
+    return [{"event": l.event_type, "details": l.details, "time": l.timestamp} for l in logs]
 
 if __name__ == "__main__":
     import uvicorn

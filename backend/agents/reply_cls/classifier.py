@@ -13,18 +13,32 @@ class ReplyClassifierAgent:
     def classify_reply(self, reply: Reply):
         logger.info(f"Classifying reply from lead {reply.lead_id}...")
         
-        prompt = f"Classify this email reply: '{reply.content}'. Categories: interested, not_interested, out_of_office, maybe."
+        # 1. Classification
+        prompt = f"Classify this email reply: '{reply.content}'. Categories: interested, not_interested, out_of_office, bounce, unsubscribe, maybe."
         classification = self.llm.generate(prompt).strip().lower()
             
         reply.classification = classification
         logger.info(f"Reply classified as: {classification}")
         
-        # Update Lead status based on reply
-        if "interested" in classification:
-            self.db.update_lead_status(reply.lead_id, "replied_interested")
-        elif "not_interested" in classification:
-            self.db.update_lead_status(reply.lead_id, "replied_stop")
+        # 2. State Machine Transition (Stop Followups)
+        # Any reply (except maybe OOO soft bounce) should likely stop the sequence.
+        # But definitively: Interested, Not Interest, Bounce, Unsub -> STOP.
+        
+        new_status = f"replied_{classification}"
+        
+        if "bounce" in classification:
+            new_status = "stopped_bounce"
+            self.db.increment_metric("bounce_count")
+        elif "unsubscribe" in classification or "remove" in classification:
+            new_status = "stopped_unsub"
+        elif "interested" in classification:
+            self.db.increment_metric("positive_count")
+            self.db.increment_metric("reply_count")
         else:
-            self.db.update_lead_status(reply.lead_id, "replied_other")
+             self.db.increment_metric("reply_count")
+        
+        # Update DB
+        self.db.update_lead_status(reply.lead_id, new_status)
+        logger.info(f"Lead {reply.lead_id} status updated to {new_status} (Follow-ups Stopped)")
             
         return reply

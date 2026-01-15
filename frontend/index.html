@@ -38,22 +38,14 @@
         </section>
 
         <section id="review-queue">
-            <h2>Review Queue (Pending Approval)</h2>
-            <div class="lead-item">
-                <div class="lead-info">
-                    <h4>Alice Digits</h4>
-                    <span class="company">Tech Corp</span>
-                </div>
-                <div class="email-preview">
-                    <strong>Subject:</strong> Question about Tech Corp strategy<br>
-                    <p>Hi Alice, I noticed Tech Corp...</p>
-                </div>
-                <div class="actions">
-                    <button class="btn-approve">Approve</button>
-                    <button class="btn-edit">Edit</button>
-                    <button class="btn-reject">Reject</button>
+            <div class="queue-header">
+                <h2>Review Queue</h2>
+                <div class="batch-actions" style="display:none;">
+                    <span id="selected-count">0 selected</span>
+                    <button id="btn-batch-approve" class="btn-approve">Approve Selected</button>
                 </div>
             </div>
+            <div id="queue-list"></div>
         </section>
     </main>
 
