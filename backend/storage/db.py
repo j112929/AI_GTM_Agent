@@ -212,6 +212,14 @@ class LeadStore:
         cursor.execute(f'UPDATE daily_metrics SET {field} = {field} + 1 WHERE date = ?', (today,))
         self.conn.commit()
 
+    def get_lead_by_thread_id(self, thread_id: str) -> Optional[Lead]:
+        cursor = self.conn.cursor()
+        cursor.execute('SELECT * FROM leads WHERE thread_id = ?', (thread_id,))
+        row = cursor.fetchone()
+        if row:
+            return self._row_to_lead(row)
+        return None
+
     def _row_to_lead(self, row):
         # Handle dynamic column length if strictly needed, but for now assuming fixed schema or recreating DB
         # If campaign_id was added last (index 19)

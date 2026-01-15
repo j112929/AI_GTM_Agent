@@ -49,13 +49,15 @@ class LeadResponse(BaseModel):
 def process_lead_pipeline(lead_id: str):
     logger.info(f"Background processing for lead {lead_id}")
     lead = db.get_lead(lead_id)
-    
+    if not lead: return
+
     # 1. Enrichment
-    icp = ICPPersonaAgent()
-    lead = icp.process_lead(lead)
+    icp = ICPPersonaAgent(db)
+    lead = icp.analyze_lead(lead)
     
     # 2. Generation
-    gen = EmailGeneratorAgent()
+    # Ensure downstream agent uses the potentially updated status/content
+    gen = EmailGeneratorAgent(db)
     lead = gen.generate_email(lead)
     
     # Update full lead in DB

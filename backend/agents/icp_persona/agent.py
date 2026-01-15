@@ -1,33 +1,48 @@
 from typing import Dict
+import json
 from backend.storage.models import Lead
 from backend.core.llm_client import LLMClient
 from backend.utils.logger import setup_logger
+from backend.storage.db import LeadStore
 
 logger = setup_logger("ICPPersonaAgent")
 
 class ICPPersonaAgent:
-    def __init__(self):
+    def __init__(self, db: LeadStore = None):
         self.llm = LLMClient()
+        self.db = db # Pass DB to log events
 
-    def run_llm_analysis(self, company_name: str, product_info: str) -> Dict[str, str]:
-        prompt = f"Analyze the company '{company_name}' and explain how it fits our product '{product_info}'. Return a summary."
-        analysis_text = self.llm.generate(prompt, system_prompt="You are an expert Sales Researcher.")
-        
-        # In a real system, we'd force JSON output or parse it.
-        # For now, we split the mock response or just use the whole text.
-        return {
-            "company_summary": analysis_text,
-            "product_summary": "High alignment detected based on company tech stack." # Mock enrichment
-        }
-
-    def process_lead(self, lead: Lead):
+    def analyze_lead(self, lead: Lead):
         logger.info(f"Analyzing lead: {lead.id} ({lead.company_name})")
         
-        analysis = self.run_llm_analysis(lead.company_name, "Our AI GTM Product")
+        prompt = (f"Analyze the company '{lead.company_name}' for fit with 'AI GTM Agent'. "
+                  f"Output strictly valid JSON with keys: 'company_summary', 'product_summary', 'fit_score'. "
+                  f"No markdown.")
         
-        lead.company_summary = analysis["company_summary"]
-        lead.product_summary = analysis["product_summary"]
-        lead.status = "enriched"
-        
+        try:
+            response_text = self.llm.generate(prompt)
+            # Cleanup
+            cleaned_text = response_text.replace("```json", "").replace("```", "").strip()
+            
+            data = json.loads(cleaned_text)
+            lead.company_summary = data.get("company_summary", response_text)
+            lead.product_summary = data.get("product_summary", "Auto-generated")
+            lead.status = "enriched"
+            
+            if self.db: 
+                self.db.log_event(lead.id, "ENRICH_OK", "Analysis Successful")
+                
+        except json.JSONDecodeError:
+             logger.warning(f"ICP Parse Fail {lead.id}. Using fallback.")
+             lead.company_summary = response_text
+             lead.product_summary = "Fallback summary"
+             lead.status = "enriched"
+             if self.db: self.db.log_event(lead.id, "ENRICH_WARN", "JSON Parse Failed")
+             
+        except Exception as e:
+             logger.error(f"ICP Error: {e}")
+             if self.db: self.db.log_event(lead.id, "ENRICH_ERR", str(e))
+             lead.status = "new" # Do not progress
+             
         logger.info(f"Lead enriched: {lead.id}")
         return lead
