@@ -4,6 +4,33 @@
 
 👉 **[View Integration Roadmap](docs/INTEGRATIONS.md)**
 
+## ✨ Key Highlights
+
+- **🤖 Autonomous Research**: The `ICPPersonaAgent` analyzes prospect companies and products to determine fit and key talking points.
+- **✉️ Hyper-Personalization**: The `EmailGeneratorAgent` crafts unique, relevant emails based on research data.
+- **🛡 Enterprise-Grade Risk Control**: Built-in daily **Send Caps**, **Throttling** (delay between sends), and **Idempotency** checks to prevent spam flags.
+- **👮 Human-in-the-Loop**: A dedicated **Admin UI** (served via FastAPI) allows Ops teams to batch-review, edit, and approve drafts.
+- **🔬 Full Observability**: Complete event lifecycle logging (`INGEST` -> `GEN` -> `APPROVE` -> `SEND`) for audit trails.
+- **📥 Smart Inbox Management**: `ReplyClassifierAgent` automatically categorizes replies and stops follow-ups for interested/unsubscribed leads.
+
+## 🚀 Quick Start (The "Magic Moment")
+
+We have included a pilot onboarding script to demonstrate the full agent capability in 30 seconds.
+
+1.  **Start the Backend Server**:
+    ```bash
+    python3 -m backend.api.server
+    ```
+
+2.  **Run the Pilot Demo** (in a new terminal):
+    ```bash
+    python3 scripts/pilot_onboarding.py
+    ```
+    *Follow the interactive prompts to define your ICP, generate test leads, and launch your first AI campaign.*
+
+3.  **Visit the Dashboard**:
+    Open [http://localhost:8000](http://localhost:8000) to verify the metrics and logs.
+
 ## 🏗 Architecture
 
 The system follows a modular, event-driven architecture organized into specialized agents and services.
@@ -20,152 +47,49 @@ graph TD
     H -->|Interested| I[Notify & Metrics]
 ```
 
-### ASCII View
-```text
-                 ┌───────────────────────────┐
-                 │   Admin / Ops UI (Web)     │
-                 │ ICP配置 / Review / Metrics │
-                 └─────────────┬─────────────┘
-                               │
-                               v
-┌───────────────┐     ┌───────────────────┐     ┌─────────────────────┐
-│ Lead Sources  │ --> │ Lead Ingest &      │ --> │ Lead Store          │
-│ (Apollo/LI)   │     │ Dedup/Clean        │     │ (Postgres/SQLite)   │
-└───────────────┘     └───────────────────┘     └─────────────────────┘
-                               │
-                               v
-                     ┌───────────────────┐
-                     │ Enrichment Layer  │
-                     │ (optional)        │
-                     └─────────┬─────────┘
-                               │
-                               v
-                     ┌───────────────────┐
-                     │ ICP/Persona Agent │
-                     │ (Company + Product│
-                     │  Summary -> Schema│
-                     └─────────┬─────────┘
-                               │
-                               v
-                     ┌───────────────────┐
-                     │ Email Generator   │
-                     │ (Prompt+Constraints│
-                     │  + Templates)     │
-                     └─────────┬─────────┘
-                               │
-                               v
-                     ┌───────────────────┐
-                     │ Review Queue      │
-                     │ (Human-in-loop)   │
-                     └─────────┬─────────┘
-                               │ approve
-                               v
-                     ┌───────────────────┐
-                     │ Send Orchestrator │
-                     │ (state machine)   │
-                     └─────────┬─────────┘
-                               │ SMTP/Gmail
-                               v
-                     ┌───────────────────┐
-                     │ Inbox Listener    │
-                     │ (Gmail API)       │
-                     └─────────┬─────────┘
-                               │
-                               v
-                     ┌───────────────────┐
-                     │ Reply Classifier  │
-                     │ (LLM classifier)  │
-                     └─────────┬─────────┘
-                               │
-                               v
-                     ┌───────────────────┐
-                     │ Notify + Metrics  │
-                     │ (Slack/Email + UI)│
-                     └───────────────────┘
-```
-
-## ✨ Key Features
-
-- **🤖 Autonomous Research**: The `ICPPersonaAgent` analyzes prospect companies and products to determine fit and key talking points.
-- **✉️ Hyper-Personalization**: The `EmailGeneratorAgent` crafts unique, relevant emails based on research data, not generic templates.
-- **🛡 Human-in-the-Loop**: A dedicated **Admin UI** allows GTM operations to review, edit, and approve drafts before they are sent.
-- **📥 Smart Inbox Management**: `ReplyClassifierAgent` automatically categorizes replies (e.g., "Interested", "Not Interested", "OOO") and triggers alerts for hot leads.
-- **📊 Analytics**: Tracks the full lifecycle of a lead from ingestion to conversation.
-
 ## 📂 Project Structure
-
-The project is split into a Python-based backend (Agents & Services) and a lightweight Frontend (Dashboard).
 
 ```
 /
 ├── backend/
-│   ├── agents/            # Intelligent Agents (LLM Workers)
-│   │   ├── icp_persona/   # Research & Profiling
-│   │   ├── email_gen/     # Content Generation
-│   │   └── reply_cls/     # Sentiment/Intent Classification
-│   ├── services/          # Infrastructure Services
-│   │   ├── lead_ingest/   # Data pipeline
-│   │   ├── sender/        # Sending Logic (State Machine)
-│   │   ├── listener/      # Email Polling
-│   │   └── notify/        # Slack/Alerts
-│   ├── storage/           # Database Layer (SQLite)
-│   └── main.py            # Simulation Runner
-├── frontend/              # Ops Dashboard
-│   ├── index.html         # Main UI
-│   ├── style.css          # Dark Mode Premium Styles
-│   └── app.js             # Logic
-└── README.md
+│   ├── agents/            # Intelligent Agents (Research, Drafting, Classification)
+│   ├── api/               # FastAPI Server & Endpoints
+│   ├── core/              # Config, LLM Client (OpenAI/Mock)
+│   ├── services/          # Business Logic (Ingest, Sender, Risk Control)
+│   └── storage/           # SQLite DB & Models
+├── frontend/              # Admin Dashboard (served statically by backend)
+├── scripts/               # Demo & Utility Scripts
+└── docs/                  # Documentation
 ```
 
-## 🚀 Getting Started
+## ⚙️ Configuration & Installation
 
-### Prerequisites
-
-- Python 3.8+
-- Use a modern browser for the Frontend.
-
-### Installation
-
-1.  **Clone the repository**:
-    ```bash
-    git clone https://github.com/yourusername/AI_GTM_Agent.git
-    cd AI_GTM_Agent
-    ```
-
-2.  **Install Dependencies**:
+1.  **Install Dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
 
-3.  **Verify Environment**:
-    Create a `.env` file (optional) to configure API keys:
+2.  **Environment Setup**:
+    Create a `.env` file to enable real AI features (optional, defaults to Mock mode).
+    ```bash
+    OPENAI_API_KEY=sk-...  # Required for real content generation
+    SLACK_WEBHOOK_URL=...  # Required for Slack notifications
+    MOCK_LLM=False         # Set to True to save costs during dev
     ```
-    OPENAI_API_KEY=sk-...
-    MOCK_LLM=True
+
+3.  **Run Manually**:
+    If you prefer not to use the pilot script:
+    ```bash
+    # Start Server
+    python3 -m backend.api.server
+
+    # Visit UI
+    # http://localhost:8000
     ```
-
-### Usage
-
-#### 1. Start the API Server
-The backend now exposes a REST API powered by FastAPI.
-```bash
-python3 -m backend.api.server
-```
-*Server will start at `http://localhost:8000`*
-
-#### 2. Launch the Admin Dashboard
-Open `frontend/index.html` in your browser. It is configured to talk to `localhost:8000`.
-
-#### 3. Test Ingestion (Optional)
-You can use `curl` to manually ingest a lead while the server running:
-```bash
-curl -X POST "http://localhost:8000/leads" \
-     -H "Content-Type: application/json" \
-     -d '{"name": "John Doe", "company": "Acme Inc", "email": "john@acme.com"}'
-```
 
 ## 🛠 Tech Stack
 
-- **Backend**: Python, SQLite
-- **Agents**: Designed for LLM integration (OpenAI/Anthropic/DeepSeek placeholder logic implemented).
-- **Frontend**: HTML5, CSS3 (Modern Variables, Flexbox/Grid), Vanilla JavaScript.
+- **Backend**: Python 3.9+, FastAPI, SQLite
+- **AI/LLM**: OpenAI GPT-4o (or interchangeable provider via `LLMClient`)
+- **Frontend**: Vanilla JS/CSS (Lightweight, Dark Mode)
+- **Deployment**: Ready for Docker/Cloud Run (Stateless API + Persistent DB volume)
