@@ -25,7 +25,23 @@ class LLMClient:
                         logger.warning("LangSmith not installed, skipping tracing.")
                     except Exception as e:
                         logger.warning(f"Failed to enable LangSmith tracing: {e}")
-                        
+                
+                # Langfuse Integration
+                if config.LANGFUSE_PUBLIC_KEY and config.LANGFUSE_SECRET_KEY:
+                    try:
+                        from langfuse.openai import OpenAI as LangfuseOpenAI
+                        # Re-initialize client with Langfuse wrapper if keys are present
+                        # Note: If both LangSmith and Langfuse are active, we might need a different approach 
+                        # but Langfuse's wrapper inherits from OpenAI, so it should be fine to re-instantiate 
+                        # or we can wrap the existing client if possible. 
+                        # The cleanest way for Langfuse is to use their class directly.
+                        self.client = LangfuseOpenAI(api_key=self.api_key)
+                        logger.info("Langfuse tracing enabled.")
+                    except ImportError:
+                        logger.warning("Langfuse not installed, skipping tracing.")
+                    except Exception as e:
+                         logger.warning(f"Failed to enable Langfuse tracing: {e}")
+
                 logger.info("OpenAI Client initialized.")
             except ImportError:
                 logger.error("openai module not found. Install it with `pip install openai`")

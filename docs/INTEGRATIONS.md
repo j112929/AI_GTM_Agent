@@ -85,3 +85,19 @@ To monitor, trace, and debug LLM calls, we support **LangSmith**.
    LANGCHAIN_PROJECT=AI_GTM_Agent
    ```
 3. The `LLMClient` will automatically wrap the OpenAI client to trace all calls.
+
+| Platform | Role | Implementation |
+|----------|------|----------------|
+| **Langfuse** | Open Source Tracing | Set `LANGFUSE_PUBLIC_KEY` & `LANGFUSE_SECRET_KEY` in `.env`. |
+
+
+
+### Langfuse Setup Instructions
+1. Create a Langfuse account (Cloud or Self-Hosted) and get API Keys.
+2. Add the following to your `.env` file:
+   ```bash
+   LANGFUSE_PUBLIC_KEY=pk-lf-...
+   LANGFUSE_SECRET_KEY=sk-lf-...
+   LANGFUSE_HOST=https://cloud.langfuse.com # Optional if using cloud
+   ```
+3. The system will detect these keys and automatically switch to the Langfuse OpenAI wrapper.
