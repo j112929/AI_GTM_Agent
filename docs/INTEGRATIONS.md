@@ -67,3 +67,21 @@ The `NotifierService` handles alerts:
 1.  **Ingestion**: Create a new adapter in `backend/services/lead_ingest/adapters/`.
 2.  **LLM**: Set `MOCK_LLM=False` and configure the new provider in `backend/core/llm_client.py`.
 3.  **Sending**: Implement a generic `EmailSender` interface in `backend/services/sender/providers/`.
+
+## 5. Observability (LLM Ops)
+
+To monitor, trace, and debug LLM calls, we support **LangSmith**.
+
+| Platform | Role | Implementation |
+|----------|------|----------------|
+| **LangSmith** | Tracing & Debugging | Set `LANGCHAIN_TRACING_V2=true` in `.env`. |
+
+### Setup Instructions
+1. Create a LangSmith account and get an API Key.
+2. Add the following to your `.env` file:
+   ```bash
+   LANGCHAIN_TRACING_V2=true
+   LANGCHAIN_API_KEY=your_langsmith_api_key
+   LANGCHAIN_PROJECT=AI_GTM_Agent
+   ```
+3. The `LLMClient` will automatically wrap the OpenAI client to trace all calls.

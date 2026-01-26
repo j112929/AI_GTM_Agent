@@ -14,6 +14,18 @@ class LLMClient:
             try:
                 from openai import OpenAI
                 self.client = OpenAI(api_key=self.api_key)
+                
+                # LangSmith Integration
+                if config.LANGCHAIN_TRACING_V2:
+                    try:
+                        from langsmith.wrappers import wrap_openai
+                        self.client = wrap_openai(self.client)
+                        logger.info("LangSmith tracing enabled.")
+                    except ImportError:
+                        logger.warning("LangSmith not installed, skipping tracing.")
+                    except Exception as e:
+                        logger.warning(f"Failed to enable LangSmith tracing: {e}")
+                        
                 logger.info("OpenAI Client initialized.")
             except ImportError:
                 logger.error("openai module not found. Install it with `pip install openai`")
