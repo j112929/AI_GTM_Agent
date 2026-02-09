@@ -10,3 +10,8 @@ google-auth-httplib2
 google-auth-oauthlib
 langsmith
 langfuse
+chromadb
+langchain
+langchain-community
+langchain-openai
+tiktoken

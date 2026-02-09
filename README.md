@@ -8,7 +8,8 @@
 
 - **🤖 Autonomous Research**: The `ICPPersonaAgent` analyzes prospect companies and products to determine fit and key talking points.
 - **✉️ Hyper-Personalization**: The `EmailGeneratorAgent` crafts unique, relevant emails based on research data.
-- **🛡 Enterprise-Grade Risk Control**: Built-in daily **Send Caps**, **Throttling** (delay between sends), and **Idempotency** checks to prevent spam flags.
+- **� RAG Knowledge Base**: Integrated **Retrieval-Augmented Generation** (RAG) using ChromaDB to retrieve relevant case studies, pricing, and product info during email generation.
+- **�🛡 Enterprise-Grade Risk Control**: Built-in daily **Send Caps**, **Throttling** (delay between sends), and **Idempotency** checks to prevent spam flags.
 - **👮 Human-in-the-Loop**: A dedicated **Admin UI** (served via FastAPI) allows Ops teams to batch-review, edit, and approve drafts.
 - **🔬 Full Observability**: Complete event lifecycle logging (`INGEST` -> `GEN` -> `APPROVE` -> `SEND`) for audit trails.
 - **📥 Smart Inbox Management**: `ReplyClassifierAgent` automatically categorizes replies and stops follow-ups for interested/unsubscribed leads.
@@ -40,6 +41,7 @@ graph TD
     A[Lead Sources] -->|Ingest| B(Lead Store / DB)
     B -->|New Leads| C[ICP & Persona Agent]
     C -->|Enriched Data| D[Email Generator Agent]
+    K[Knowledge Base / RAG] -->|Retrieve Context| D
     D -->|Drafts| E[Review Queue]
     E -->|Approved| F[Send Orchestrator]
     F -->|SMTP/API| G[Inbox Listener]
@@ -89,7 +91,7 @@ graph TD
 
 ## 🛠 Tech Stack
 
-- **Backend**: Python 3.9+, FastAPI, SQLite
+- **Backend**: Python 3.9+, FastAPI, SQLite, ChromaDB (Vector Store)
 - **AI/LLM**: OpenAI GPT-4o (or interchangeable provider via `LLMClient`)
 - **Frontend**: Vanilla JS/CSS (Lightweight, Dark Mode)
 - **Deployment**: Ready for Docker/Cloud Run (Stateless API + Persistent DB volume)

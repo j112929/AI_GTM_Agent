@@ -3,6 +3,7 @@ from backend.storage.models import Lead
 from backend.core.llm_client import LLMClient
 from backend.utils.logger import setup_logger
 from backend.storage.db import LeadStore
+from backend.services.rag.service import RAGService
 
 logger = setup_logger("EmailGeneratorAgent")
 
@@ -10,14 +11,23 @@ class EmailGeneratorAgent:
     def __init__(self, db: LeadStore = None):
         self.llm = LLMClient()
         self.db = db
+        self.rag = RAGService()
 
     def generate_email(self, lead: Lead):
         logger.info(f"Generating email for lead: {lead.id}")
+        
+        # Retrieve relevant context from RAG
+        rag_query = f"{lead.company_summary} {lead.product_summary}"
+        rag_results = self.rag.query(rag_query, n_results=2)
+        rag_context = "\n".join([f"- {r['content']}" for r in rag_results])
         
         prompt = f"""
         Draft a cold email to {lead.name} at {lead.company_name}.
         Context: {lead.company_summary}
         Our Value: {lead.product_summary}
+        
+        Relevant Knowledge from our Data:
+        {rag_context}
         
         Output strictly valid JSON with keys: 'subject', 'body'.
         """
